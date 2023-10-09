@@ -1,63 +1,65 @@
-const { sendMsg2RecvdApi } = require('../service/webhook')
-const { TextMsg } = require('../utils/msg')
+const { sendMsg2RecvdApi } = require("../service/webhook");
+const { TextMsg } = require("../utils/msg");
 
 // 登录
 module.exports = function registerLoginCheck({ app, bot }) {
   let message,
-    success = false
+    success = false;
 
   bot
-    .on('scan', qrcode => {
-      message = 'https://wechaty.js.org/qrcode/' + encodeURIComponent(qrcode)
-      success = false
+    .on("scan", (qrcode) => {
+      message = "https://wechaty.js.org/qrcode/" + encodeURIComponent(qrcode);
+      success = false;
     })
-    .on('login', user => {
-      message = user + 'is already login'
-      success = true
-      sendMsg2RecvdApi(new TextMsg({
-        text: JSON.stringify({ event: 'login', user }),
-        isSystemEvent: true
-      }))
+    .on("login", (user) => {
+      message = user + "is already login";
+      success = true;
+      // sendMsg2RecvdApi(new TextMsg({
+      //   text: JSON.stringify({ event: 'login', user }),
+      //   isSystemEvent: true
+      // }))
     })
-    .on('logout', user => {
-      message = ''
-      success = false
+    .on("logout", (user) => {
+      message = "";
+      success = false;
       // 登出时给接收消息api发送特殊文本
-      sendMsg2RecvdApi(new TextMsg({
-        text: JSON.stringify({ event: 'logout', user }),
-        isSystemEvent: true
-      }))
+      sendMsg2RecvdApi(
+        new TextMsg({
+          text: JSON.stringify({ event: "logout", user }),
+          isSystemEvent: true,
+        })
+      );
     })
-    .on('error', error => {
+    .on("error", (error) => {
       // 报错时接收特殊文本
-      sendMsg2RecvdApi(new TextMsg({
-        text: JSON.stringify({ event: 'error', error }),
-        isSystemEvent: true
-      }))
-    })
+      // sendMsg2RecvdApi(new TextMsg({
+      //   text: JSON.stringify({ event: 'error', error }),
+      //   isSystemEvent: true
+      // }))
+    });
 
   // 处理 POST 请求
-  app.get('/loginCheck', async (req, res) => {
-
+  app.get("/loginCheck", async (req, res) => {
     // getLoginApiToken
-    const { token } = req.query
+    const { token } = req.query;
 
     if (token !== process.env.globalLoginToken) {
       return res.status(401).json({
         success: false,
-        message: 'Unauthorized: Access is denied due to invalid credentials.'
+        message: "Unauthorized: Access is denied due to invalid credentials.",
       });
     }
 
     try {
       res.status(200).json({
         success,
-        message
-      })
-
+        message,
+      });
     } catch (error) {
-      console.error('Error handling POST request:', error);
-      res.status(500).json({ success: false, message: 'Internal server error.' });
+      console.error("Error handling POST request:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error." });
     }
   });
-} 
+};
