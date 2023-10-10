@@ -30,7 +30,7 @@ module.exports = function init() {
     .on("message", async (message) => {
       console.log(`Message: ${message}`);
       //收到消息二次转发特殊处理
-      // sendMsg2RecvdApi(message)
+      sendMsg2RecvdApi(message);
     })
     .on("error", (error) => {
       console.error(`\n${chalk.red(error)}\n`);
